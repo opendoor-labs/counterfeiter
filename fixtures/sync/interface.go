@@ -1,6 +1,6 @@
-package sync // import "github.com/maxbrunsfeld/counterfeiter/v6/fixtures/sync"
+package sync // import "github.com/maxbrunsfeld/counterfeiter/fixtures/sync"
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . SyncSomething
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . SyncSomething
 type SyncSomething interface {
 	DoThings(string, uint64) (int, error)
 	DoNothing()

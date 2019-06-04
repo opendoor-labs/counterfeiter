@@ -36,7 +36,7 @@ OPTIONS
 		go generate by adding the following to a .go file:
 
 		# runs counterfeiter in generate mode
-		//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+		//go:generate go run github.com/maxbrunsfeld/counterfeiter -generate
 
 	example:
 		Add the following to a .go file:

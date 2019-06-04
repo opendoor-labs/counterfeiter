@@ -34,7 +34,7 @@ $ cat tools/tools.go
 package tools
 
 import (
-	_ "github.com/maxbrunsfeld/counterfeiter/v6"
+	_ "github.com/maxbrunsfeld/counterfeiter"
 )
 
 // This file imports packages that are used when running go generate, or used
@@ -52,7 +52,7 @@ $ cat myinterface.go
 ```go
 package foo
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . MySpecialInterface
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . MySpecialInterface
 
 type MySpecialInterface interface {
 	DoThings(string, uint64) (int, error)
@@ -78,7 +78,7 @@ $ cat myinterface.go
 package foo
 
 // You only need **one** of these per package!
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+//go:generate go run github.com/maxbrunsfeld/counterfeiter -generate
 
 // You will add lots of directives like these in the same package...
 //counterfeiter:generate . MySpecialInterface
@@ -112,7 +112,7 @@ $ go generate ./...
 You can use the following command to invoke `counterfeiter` from within a go module:
 
 ```shell
-$ go run github.com/maxbrunsfeld/counterfeiter/v6
+$ go run github.com/maxbrunsfeld/counterfeiter
 
 USAGE
 	counterfeiter
@@ -151,7 +151,7 @@ type MySpecialInterface interface {
 ```
 
 ```shell
-$ go run github.com/maxbrunsfeld/counterfeiter/v6 path/to/foo MySpecialInterface
+$ go run github.com/maxbrunsfeld/counterfeiter path/to/foo MySpecialInterface
 Wrote `FakeMySpecialInterface` to `path/to/foo/foofakes/fake_my_special_interface.go`
 ```
 
@@ -194,7 +194,7 @@ For more examples of using the `counterfeiter` API, look at [some of the provide
 For third party interfaces, you can specify the interface using the alternative syntax `<package>.<interface>`, for example:
 
 ```shell
-$ go run github.com/maxbrunsfeld/counterfeiter/v6 github.com/go-redis/redis.Pipeliner
+$ go run github.com/maxbrunsfeld/counterfeiter github.com/go-redis/redis.Pipeliner
 ```
 
 ### Running The Tests For `counterfeiter`

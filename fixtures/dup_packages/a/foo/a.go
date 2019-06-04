@@ -1,8 +1,8 @@
-package foo // import "github.com/maxbrunsfeld/counterfeiter/v6/fixtures/dup_packages/a/foo"
+package foo // import "github.com/maxbrunsfeld/counterfeiter/fixtures/dup_packages/a/foo"
 
 type S struct{}
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . I
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . I
 type I interface {
 	FromA() S
 }

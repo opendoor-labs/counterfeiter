@@ -32,7 +32,7 @@ func testRegexp(t *testing.T, when spec.G, it spec.S) {
 				args:    []string{".", "Intf"},
 			},
 			{
-				input:   "//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Intf",
+				input:   "//go:generate go run github.com/maxbrunsfeld/counterfeiter . Intf",
 				matches: true,
 				args:    []string{".", "Intf"},
 			},

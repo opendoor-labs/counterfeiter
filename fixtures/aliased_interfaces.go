@@ -1,9 +1,9 @@
 package fixtures
 
-import alias "github.com/maxbrunsfeld/counterfeiter/v6/fixtures/another_package"
+import alias "github.com/maxbrunsfeld/counterfeiter/fixtures/another_package"
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AliasedInterface
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . AliasedInterface
+//go:generate go run github.com/maxbrunsfeld/counterfeiter -generate
 //counterfeiter:generate . AliasedInterface
 
 // AliasedInterface is an interface that embeds an interface in an aliased package.
