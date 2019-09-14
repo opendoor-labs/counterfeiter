@@ -59,7 +59,7 @@ func runTests(useGopath bool, t *testing.T, when spec.G, it spec.S) {
 		}
 
 		if useGopath {
-			baseDir = filepath.Join(testDir, "src", "github.com", "maxbrunsfeld", "counterfeiter", "v6", "fixtures")
+			baseDir = filepath.Join(testDir, "src", "github.com", "maxbrunsfeld", "counterfeiter", "fixtures")
 		} else {
 			baseDir = testDir
 		}
