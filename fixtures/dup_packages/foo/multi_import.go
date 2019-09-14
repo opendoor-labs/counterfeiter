@@ -7,7 +7,7 @@ import (
 
 type S struct{}
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . MultiAB
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . MultiAB
 type MultiAB interface {
 	Mine() S
 	foo.I

@@ -2,7 +2,7 @@ package foo // import "github.com/maxbrunsfeld/counterfeiter/fixtures/dup_packag
 
 type S struct{}
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . I
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . I
 type I interface {
 	FromA() S
 }

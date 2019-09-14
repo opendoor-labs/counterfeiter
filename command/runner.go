@@ -89,7 +89,7 @@ func invocations(cwd string, generateMode bool) ([]Invocation, error) {
 }
 
 var directive = regexp.MustCompile(`(?mi)^//(go:generate|counterfeiter:generate)\s*(.*)?\s*$`)
-var args = regexp.MustCompile(`(?mi)^(?:go run github\.com/maxbrunsfeld/counterfeiter/v6|gobin -m -run github\.com/maxbrunsfeld/counterfeiter/v6|counterfeiter|counterfeiter.exe)\s*(.*)?\s*$`)
+var args = regexp.MustCompile(`(?mi)^(?:go run github\.com/maxbrunsfeld/counterfeiter|gobin -m -run github\.com/maxbrunsfeld/counterfeiter|counterfeiter|counterfeiter.exe)\s*(.*)?\s*$`)
 
 type match struct {
 	directive string

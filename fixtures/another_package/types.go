@@ -2,7 +2,7 @@ package another_package // import "github.com/maxbrunsfeld/counterfeiter/fixture
 
 type SomeType int
 
-//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . AnotherInterface
+//go:generate go run github.com/maxbrunsfeld/counterfeiter . AnotherInterface
 type AnotherInterface interface {
 	AnotherMethod([]SomeType, map[SomeType]SomeType, *SomeType, SomeType, chan SomeType)
 }
