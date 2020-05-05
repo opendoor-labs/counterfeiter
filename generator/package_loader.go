@@ -2,8 +2,6 @@ package generator
 
 import (
 	"go/types"
-
-	"golang.org/x/tools/go/packages"
 )
 
 type rawMethod struct {
@@ -13,12 +11,12 @@ type rawMethod struct {
 
 // packageMethodSet identifies the functions that are exported from a given
 // package.
-func packageMethodSet(p *packages.Package) []*rawMethod {
-	if p == nil || p.Types == nil || p.Types.Scope() == nil {
+func packageMethodSet(p *types.Package) []*rawMethod {
+	if p == nil || p.Scope() == nil {
 		return nil
 	}
 	var result []*rawMethod
-	scope := p.Types.Scope()
+	scope := p.Scope()
 	for _, name := range scope.Names() {
 		obj := scope.Lookup(name)
 		if !obj.Exported() {
