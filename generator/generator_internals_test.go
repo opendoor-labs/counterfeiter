@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"go/types"
 	"io/ioutil"
 	"log"
 	"testing"
@@ -8,7 +9,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
-	"golang.org/x/tools/go/packages"
 )
 
 func TestGenerator(t *testing.T) {
@@ -254,7 +254,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 
 				it("can load packages", func() {
 					Expect(len(f.Packages)).To(BeNumerically(">=", 1))
-					Expect(f.Packages[0].Name).To(Equal("os"))
+					Expect(f.Packages[0].Name()).To(Equal("os"))
 				})
 
 				it("can find the package with the os package path", func() {
@@ -265,8 +265,8 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 				})
 
 				it("skips invalid packages", func() {
-					var p []*packages.Package
-					empty := &packages.Package{}
+					var p []*types.Package
+					empty := &types.Package{}
 					p = append(p, empty)
 					p = append(p, f.Packages...)
 					f.Packages = p
