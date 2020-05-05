@@ -31,7 +31,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 		when("the target is a nonexistent package", func() {
 			it("errors", func() {
 				c := &Cache{}
-				f, err = NewFake(InterfaceOrFunction, "NonExistent", "nonexistentpackage", "FakeNonExistent", "nonexistentpackagefakes", "", "", c)
+				f, err = NewFake(InterfaceOrFunction, "NonExistent", "nonexistentpackage", "FakeNonExistent", "nonexistentpackagefakes", "", "", "", c)
 				Expect(err).To(HaveOccurred())
 				Expect(f).To(BeNil())
 			})
@@ -40,7 +40,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 		when("the target is a package with a nonexistent interface", func() {
 			it("errors", func() {
 				c := &Cache{}
-				f, err = NewFake(InterfaceOrFunction, "NonExistent", "os", "FakeNonExistent", "osfakes", "", "", c)
+				f, err = NewFake(InterfaceOrFunction, "NonExistent", "os", "FakeNonExistent", "osfakes", "", "", "", c)
 				Expect(err).To(HaveOccurred())
 				Expect(f).To(BeNil())
 			})
@@ -49,7 +49,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 		when("the target is an interface that exists", func() {
 			it("succeeds", func() {
 				c := &Cache{}
-				f, err = NewFake(InterfaceOrFunction, "FileInfo", "os", "FakeFileInfo", "osfakes", "", "", c)
+				f, err = NewFake(InterfaceOrFunction, "FileInfo", "os", "FakeFileInfo", "osfakes", "", "", "", c)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(f).NotTo(BeNil())
 				Expect(f.TargetAlias).To(Equal("os"))
@@ -80,7 +80,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 		when("the target is a function that exists", func() {
 			it("succeeds", func() {
 				c := &Cache{}
-				f, err = NewFake(InterfaceOrFunction, "HandlerFunc", "net/http", "FakeHandlerFunc", "httpfakes", "", "", c)
+				f, err = NewFake(InterfaceOrFunction, "HandlerFunc", "net/http", "FakeHandlerFunc", "httpfakes", "", "", "", c)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(f).NotTo(BeNil())
@@ -156,7 +156,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 					f.TargetPackage = "os"
 					f.TargetName = "FileInfo"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).NotTo(HaveOccurred())
 					err = f.findPackage()
 					Expect(err).NotTo(HaveOccurred())
@@ -177,7 +177,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 					f.TargetPackage = "net/http"
 					f.TargetName = "HandlerFunc"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).NotTo(HaveOccurred())
 					err = f.findPackage()
 					Expect(err).NotTo(HaveOccurred())
@@ -198,7 +198,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 					f.TargetPackage = "net/http"
 					f.TargetName = "Client"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).NotTo(HaveOccurred())
 					err = f.findPackage()
 					Expect(err).To(HaveOccurred())
@@ -224,7 +224,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 					f.TargetPackage = "os"
 					f.TargetName = "FileInfo"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).NotTo(HaveOccurred())
 				})
 			})
@@ -239,7 +239,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 				it("returns an error", func() {
 					f.TargetPackage = "counterfeiternonexistentpackage"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).To(HaveOccurred())
 				})
 			})
@@ -248,7 +248,7 @@ func testGenerator(t *testing.T, when spec.G, it spec.S) {
 				it.Before(func() {
 					f.TargetPackage = "os"
 					c := &Cache{}
-					err := f.loadPackages(c, "")
+					err := f.loadPackages(c, "", "")
 					Expect(err).NotTo(HaveOccurred())
 				})
 

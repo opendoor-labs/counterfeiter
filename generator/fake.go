@@ -48,7 +48,7 @@ type Method struct {
 
 // NewFake returns a Fake that loads the package and finds the interface or the
 // function.
-func NewFake(fakeMode FakeMode, targetName string, packagePath string, fakeName string, destinationPackage string, headerContent string, workingDir string, cache Cacher) (*Fake, error) {
+func NewFake(fakeMode FakeMode, targetName, packagePath, fakeName, destinationPackage, headerContent, workingDir, exportDataFile string, cache Cacher) (*Fake, error) {
 	f := &Fake{
 		TargetName:         targetName,
 		TargetPackage:      packagePath,
@@ -60,7 +60,7 @@ func NewFake(fakeMode FakeMode, targetName string, packagePath string, fakeName 
 	}
 
 	f.Imports.Add("sync", "sync")
-	err := f.loadPackages(cache, workingDir)
+	err := f.loadPackages(cache, workingDir, exportDataFile)
 	if err != nil {
 		return nil, err
 	}
