@@ -10,7 +10,6 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/imports"
 )
 
@@ -25,8 +24,8 @@ const (
 
 // Fake is used to generate a Fake implementation of an interface.
 type Fake struct {
-	Packages           []*packages.Package
-	Package            *packages.Package
+	Packages           []*types.Package
+	Package            *types.Package
 	Target             *types.TypeName
 	Mode               FakeMode
 	DestinationPackage string

@@ -29,7 +29,7 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 		}
 		importPath = bp.ImportPath
 	}
-	p, err := packages.Load(&packages.Config{
+	pkgs, err := packages.Load(&packages.Config{
 		Mode:  packages.NeedName | packages.NeedFiles | packages.NeedImports | packages.NeedDeps | packages.NeedTypes,
 		Dir:   workingDir,
 		Tests: true,
@@ -38,17 +38,21 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 		return err
 	}
 	for i := range p {
-		if len(p[i].Errors) > 0 {
+		if len(pkgs[i].Errors) > 0 {
 			if i == 0 {
-				err = p[i].Errors[0]
+				err = pkgs[i].Errors[0]
 			}
-			for j := range p[i].Errors {
-				log.Printf("error loading packages: %v", strings.TrimPrefix(fmt.Sprintf("%v", p[i].Errors[j]), "-: "))
+			for j := range pkgs[i].Errors {
+				log.Printf("error loading packages: %v", strings.TrimPrefix(fmt.Sprintf("%v", pkgs[i].Errors[j]), "-: "))
 			}
 		}
 	}
 	if err != nil {
 		return err
+	}
+
+	for _, pkg := range pkgs {
+		p = append(p, pkg.Types)
 	}
 	f.Packages = p
 	c.Store(f.TargetPackage, p)
@@ -58,9 +62,9 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 
 func (f *Fake) findPackage() error {
 	var target *types.TypeName
-	var pkg *packages.Package
+	var pkg *types.Package
 	for i := range f.Packages {
-		if f.Packages[i].Types == nil || f.Packages[i].Types.Scope() == nil {
+		if f.Packages[i] == nil || f.Packages[i].Scope() == nil {
 			continue
 		}
 		pkg = f.Packages[i]
@@ -68,7 +72,7 @@ func (f *Fake) findPackage() error {
 			break
 		}
 
-		raw := pkg.Types.Scope().Lookup(f.TargetName)
+		raw := pkg.Scope().Lookup(f.TargetName)
 		if raw != nil {
 			if typeName, ok := raw.(*types.TypeName); ok {
 				target = typeName
@@ -87,8 +91,8 @@ func (f *Fake) findPackage() error {
 	}
 	f.Target = target
 	f.Package = pkg
-	f.TargetPackage = imports.VendorlessPath(pkg.PkgPath)
-	t := f.Imports.Add(pkg.Name, f.TargetPackage)
+	f.TargetPackage = imports.VendorlessPath(pkg.Path())
+	t := f.Imports.Add(pkg.Name(), f.TargetPackage)
 	f.TargetAlias = t.Alias
 	if f.Mode != Package {
 		f.TargetName = target.Name()
