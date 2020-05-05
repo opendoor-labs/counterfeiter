@@ -140,7 +140,7 @@ func doGenerate(workingDir string, args *arguments.ParsedArguments, cache genera
 		return nil, err
 	}
 
-	f, err := generator.NewFake(mode, args.InterfaceName, args.PackagePath, args.FakeImplName, args.DestinationPackageName, headerContent, workingDir, cache)
+	f, err := generator.NewFake(mode, args.InterfaceName, args.PackagePath, args.FakeImplName, args.DestinationPackageName, headerContent, workingDir, args.ExportDataFile, cache)
 	if err != nil {
 		return nil, err
 	}

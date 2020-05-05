@@ -3,17 +3,20 @@ package generator
 import (
 	"fmt"
 	"go/build"
+	"go/token"
 	"go/types"
 	"log"
+	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
 
+	"golang.org/x/tools/go/gcexportdata"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/tools/imports"
 )
 
-func (f *Fake) loadPackages(c Cacher, workingDir string) error {
+func (f *Fake) loadPackages(c Cacher, workingDir, exportDataFile string) error {
 	log.Println("loading packages...")
 	p, ok := c.Load(f.TargetPackage)
 	if ok {
@@ -21,6 +24,7 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 		log.Printf("loaded %v packages from cache\n", len(f.Packages))
 		return nil
 	}
+
 	importPath := f.TargetPackage
 	if !filepath.IsAbs(importPath) {
 		bp, err := build.Import(f.TargetPackage, workingDir, build.FindOnly)
@@ -29,15 +33,57 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 		}
 		importPath = bp.ImportPath
 	}
+
+	var err error
+	if exportDataFile != "" {
+		p, err = f.loadWithGCExportData(exportDataFile, importPath)
+	} else {
+		p, err = f.loadWithPackages(workingDir, importPath)
+	}
+	if err != nil {
+		return err
+	}
+
+	f.Packages = p
+	c.Store(f.TargetPackage, p)
+	log.Printf("loaded %v packages\n", len(f.Packages))
+	return nil
+}
+
+func (f *Fake) loadWithGCExportData(exportDataFile, importPath string) ([]*types.Package, error) {
+	exportFile, err := os.Open(exportDataFile)
+	if err != nil {
+		return nil, err
+	}
+	defer exportFile.Close()
+
+	r, err := gcexportdata.NewReader(exportFile)
+	if err != nil {
+		return nil, err
+	}
+
+	// Decode the export data.
+	fset := token.NewFileSet()
+	imports := make(map[string]*types.Package)
+	pkg, err := gcexportdata.Read(r, fset, imports, importPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return []*types.Package{pkg}, nil
+}
+
+func (f *Fake) loadWithPackages(workingDir, importPath string) ([]*types.Package, error) {
 	pkgs, err := packages.Load(&packages.Config{
 		Mode:  packages.NeedName | packages.NeedFiles | packages.NeedImports | packages.NeedDeps | packages.NeedTypes,
 		Dir:   workingDir,
 		Tests: true,
 	}, importPath)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for i := range p {
+
+	for i := range pkgs {
 		if len(pkgs[i].Errors) > 0 {
 			if i == 0 {
 				err = pkgs[i].Errors[0]
@@ -48,16 +94,14 @@ func (f *Fake) loadPackages(c Cacher, workingDir string) error {
 		}
 	}
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	var p []*types.Package
 	for _, pkg := range pkgs {
 		p = append(p, pkg.Types)
 	}
-	f.Packages = p
-	c.Store(f.TargetPackage, p)
-	log.Printf("loaded %v packages\n", len(f.Packages))
-	return nil
+	return p, nil
 }
 
 func (f *Fake) findPackage() error {

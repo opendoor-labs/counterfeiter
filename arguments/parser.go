@@ -23,13 +23,11 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 		"",
 		"The name of the fake struct",
 	)
-
 	outputPathFlag := fs.String(
 		"o",
 		"",
 		"The file or directory to which the generated fake will be written",
 	)
-
 	packageFlag := fs.Bool(
 		"p",
 		false,
@@ -44,6 +42,11 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 		"header",
 		"",
 		"A path to a file that should be used as a header for the generated fake",
+	)
+	exportDataFlag := fs.String(
+		"export-data",
+		"",
+		"A path to an object or archive file containing type information",
 	)
 	helpFlag := fs.Bool(
 		"help",
@@ -66,8 +69,9 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 	result := &ParsedArguments{
 		PrintToStdOut: any(args, "-"),
 		GenerateInterfaceAndShimFromPackageDirectory: packageMode,
-		GenerateMode: *generateFlag,
-		HeaderFile:   *headerFlag,
+		GenerateMode:   *generateFlag,
+		HeaderFile:     *headerFlag,
+		ExportDataFile: *exportDataFlag,
 	}
 	if *generateFlag {
 		return result, nil
@@ -201,6 +205,8 @@ type ParsedArguments struct {
 	GenerateMode  bool
 
 	HeaderFile string
+
+	ExportDataFile string // Name of an object (.o) or archive (.a) file containing type information
 }
 
 func fixupUnexportedNames(interfaceName string) string {
