@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"runtime/debug"
 	"runtime/pprof"
 
 	"github.com/maxbrunsfeld/counterfeiter/arguments"
@@ -17,8 +16,6 @@ import (
 )
 
 func main() {
-	debug.SetGCPercent(-1)
-
 	if err := run(); err != nil {
 		fail("%v", err)
 	}
