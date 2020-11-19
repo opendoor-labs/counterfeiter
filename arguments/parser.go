@@ -48,6 +48,11 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 		"",
 		"A path to an object or archive file containing type information",
 	)
+    quietFlag := fs.Bool(
+		"q",
+		false,
+		"Suppress status statements",
+	)
 	helpFlag := fs.Bool(
 		"help",
 		false,
@@ -72,6 +77,7 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 		GenerateMode:   *generateFlag,
 		HeaderFile:     *headerFlag,
 		ExportDataFile: *exportDataFlag,
+		Quiet:          *quietFlag,
 	}
 	if *generateFlag {
 		return result, nil
@@ -203,6 +209,7 @@ type ParsedArguments struct {
 
 	PrintToStdOut bool
 	GenerateMode  bool
+	Quiet         bool
 
 	HeaderFile string
 
