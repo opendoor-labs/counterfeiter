@@ -1,9 +1,9 @@
-// +build windows
+//go:build windows
 
 package arguments_test
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -38,7 +38,7 @@ func testParsingArguments(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		RegisterTestingT(t)
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 		workingDir = "C:\\Users\\test-user\\workspace"
 
 		evaler = func(input string) (string, error) {
@@ -56,7 +56,7 @@ func testParsingArguments(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("copies the provided output path into the result", func() {
-			Expect(parsedArgs.OutputPath).To(Equal("C:\\tmp\\foo"))
+			Expect(parsedArgs.OutputPath).To(Equal("C:\\tmp\\foo\\fake_writer.go"))
 			Expect(err).NotTo(HaveOccurred())
 		})
 	})

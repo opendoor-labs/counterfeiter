@@ -2,8 +2,7 @@ package integration_test
 
 import (
 	"fmt"
-	"go/build"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,31 +16,24 @@ import (
 )
 
 func runTests(t *testing.T, when spec.G, it spec.S) {
-	log.SetOutput(ioutil.Discard) // Comment this out to see verbose log output
+	log.SetOutput(io.Discard) // Comment this out to see verbose log output
 	log.SetFlags(log.Llongfile)
 	var (
-		baseDir             string
-		relativeDir         string
-		originalGopath      string
-		originalBuildGopath string
-		originalGo111module string
-		testDir             string
-		copyDirFunc         func()
-		copyFileFunc        func(name string)
-		initModuleFunc      func()
-		writeToTestData     bool
+		baseDir         string
+		relativeDir     string
+		testDir         string
+		copyDirFunc     func()
+		copyFileFunc    func(name string)
+		initModuleFunc  func()
+		writeToTestData bool
 	)
 
 	name := "working with a module"
 
 	it.Before(func() {
 		RegisterTestingT(t)
-		originalGo111module = os.Getenv("GO111MODULE")
-		os.Setenv("GO111MODULE", "on")
-		originalGopath = os.Getenv("GOPATH")
-		originalBuildGopath = build.Default.GOPATH
 		var err error
-		testDir, err = ioutil.TempDir("", "counterfeiter-integration")
+		testDir, err = os.MkdirTemp("", "counterfeiter-integration")
 		Expect(err).NotTo(HaveOccurred())
 		os.Unsetenv("GOPATH")
 		baseDir = testDir
@@ -63,14 +55,14 @@ func runTests(t *testing.T, when spec.G, it spec.S) {
 
 			err = os.MkdirAll(dir, 0777)
 			Expect(err).ToNot(HaveOccurred())
-			b, err := ioutil.ReadFile(filepath.Join(relativeDir, name))
+			b, err := os.ReadFile(filepath.Join(relativeDir, name))
 			Expect(err).ToNot(HaveOccurred())
-			err = ioutil.WriteFile(filepath.Join(baseDir, name), b, 0755)
+			err = os.WriteFile(filepath.Join(baseDir, name), b, 0755)
 			Expect(err).ToNot(HaveOccurred())
 		}
 		initModuleFunc = func() {
 			copyFileFunc("blank.go")
-			err := ioutil.WriteFile(filepath.Join(baseDir, "go.mod"), []byte("module github.com/maxbrunsfeld/counterfeiter/v6/fixtures"), 0755)
+			err := os.WriteFile(filepath.Join(baseDir, "go.mod"), []byte("module github.com/maxbrunsfeld/counterfeiter/v6/fixtures"), 0755)
 			Expect(err).ToNot(HaveOccurred())
 		}
 		// Set this to true to write the output of tests to the testdata/output
@@ -79,17 +71,6 @@ func runTests(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	it.After(func() {
-		if originalGo111module != "" {
-			os.Setenv("GO111MODULE", originalGo111module)
-		} else {
-			os.Unsetenv("GO111MODULE")
-		}
-		if originalGopath != "" {
-			os.Setenv("GOPATH", originalGopath)
-		} else {
-			os.Unsetenv("GOPATH")
-		}
-		build.Default.GOPATH = originalBuildGopath
 		if baseDir == "" {
 			return
 		}
@@ -115,7 +96,7 @@ func runTests(t *testing.T, when spec.G, it spec.S) {
 				}
 				WriteOutput(b, filepath.Join(baseDir, "fixturesfakes", "fake_write_closer."+variant+".go"))
 				RunBuild(baseDir)
-				b2, err := ioutil.ReadFile(filepath.Join("testdata", "expected_fake_writecloser."+variant+".txt"))
+				b2, err := os.ReadFile(filepath.Join("testdata", "expected_fake_writecloser."+variant+".txt"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(string(b2)).To(Equal(string(b)))
 			})
@@ -137,6 +118,25 @@ func runTests(t *testing.T, when spec.G, it spec.S) {
 			}
 			WriteOutput(b, filepath.Join(baseDir, "fixturesfakes", "fake_os.go"))
 			RunBuild(baseDir)
+		})
+	})
+
+	when("generating interfaces using type aliases", func() {
+		it.Before(func() {
+			relativeDir = filepath.Join(relativeDir, "type_aliases")
+			copyDirFunc()
+		})
+		it("imports the aliased type, not the underlying type", func() {
+			cache := &generator.FakeCache{}
+			pkgPath := "github.com/maxbrunsfeld/counterfeiter/v6/fixtures/type_aliases"
+			interfaceName := "WithAliasedType"
+			fakePackageName := "type_aliasesfakes"
+			f, err := generator.NewFake(generator.InterfaceOrFunction, interfaceName, pkgPath, "Fake"+interfaceName, fakePackageName, "", baseDir, "", cache)
+			Expect(err).NotTo(HaveOccurred())
+			b, err := f.Generate(false)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(string(b)).NotTo(ContainSubstring("primitive"))
+			Expect(string(b)).To(ContainSubstring(`"github.com/maxbrunsfeld/counterfeiter/v6/fixtures/type_aliases/extra"`))
 		})
 	})
 

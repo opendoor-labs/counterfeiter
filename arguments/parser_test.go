@@ -1,11 +1,11 @@
-// +build !windows
+//go:build !windows
 
 package arguments_test
 
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path"
@@ -41,7 +41,7 @@ func testParsingArguments(t *testing.T, when spec.G, it spec.S) {
 
 	it.Before(func() {
 		RegisterTestingT(t)
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 		workingDir = "/home/test-user/workspace"
 
 		evaler = func(input string) (string, error) {
@@ -68,7 +68,7 @@ func testParsingArguments(t *testing.T, when spec.G, it spec.S) {
 		when("given a stdlib package", func() {
 			it("sets arguments as expected", func() {
 				Expect(parsedArgs.SourcePackageDir).To(Equal("os"))
-				Expect(parsedArgs.OutputPath).To(Equal(path.Join(workingDir, "osshim")))
+				Expect(parsedArgs.OutputPath).To(Equal(path.Join(workingDir, "osshim", "os.go")))
 				Expect(parsedArgs.DestinationPackageName).To(Equal("osshim"))
 			})
 		})
@@ -130,7 +130,34 @@ func testParsingArguments(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("copies the provided output path into the result", func() {
-			Expect(parsedArgs.OutputPath).To(Equal("/tmp/foo"))
+			Expect(parsedArgs.OutputPath).To(Equal("/tmp/foo/fake_writer.go"))
+		})
+	})
+
+	when("when a single argument is provided with the output file", func() {
+		it.Before(func() {
+			args = []string{"counterfeiter", "-o", "/tmp/foo/fake_foo.go", "io.Writer"}
+			justBefore()
+		})
+
+		it("indicates to not print to stdout", func() {
+			Expect(parsedArgs.PrintToStdOut).To(BeFalse())
+		})
+
+		it("provides a name for the fake implementing the interface", func() {
+			Expect(parsedArgs.FakeImplName).To(Equal("FakeWriter"))
+		})
+
+		it("provides a path for the interface source", func() {
+			Expect(parsedArgs.PackagePath).To(Equal("io"))
+		})
+
+		it("treats the last segment as the interface to counterfeit", func() {
+			Expect(parsedArgs.InterfaceName).To(Equal("Writer"))
+		})
+
+		it("copies the provided output path into the result", func() {
+			Expect(parsedArgs.OutputPath).To(Equal("/tmp/foo/fake_foo.go"))
 		})
 	})
 

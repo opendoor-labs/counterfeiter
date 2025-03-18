@@ -28,40 +28,37 @@ func testRegexp(t *testing.T, when spec.G, it spec.S) {
 		cases = []Case{
 			{
 				input:   "//go:generate counterfeiter . Intf",
-				matches: true,
-				args:    []string{".", "Intf"},
+				matches: false,
 			},
 			{
 				input:   "//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 . Intf",
-				matches: true,
-				args:    []string{".", "Intf"},
+				matches: false,
 			},
 			{
 				input:   "//counterfeiter:generate . Intf",
 				matches: true,
-				args:    []string{".", "Intf"},
+				args:    []string{"counterfeiter", ".", "Intf"},
 			},
 			{
-				input:   "//go:generate  stringer -type=Enum",
+				input:   "//go:generate stringer -type=Enum",
 				matches: false,
-				args:    []string{".", "Intf"},
 			},
 		}
 	})
 
-	it.Focus("splits args correctly", func() {
+	it("splits args correctly", func() {
 		Expect(stringToArgs(". Intf")).To(ConsistOf([]string{"counterfeiter", ".", "Intf"}))
 		Expect(stringToArgs("    .    Intf     ")).To(ConsistOf([]string{"counterfeiter", ".", "Intf"}))
 	})
 
 	it("matches lines appropriately", func() {
 		for _, c := range cases {
-			result := matchForString(c.input)
+			result, ok := matchForString(c.input)
 			if c.matches {
-				Expect(result).NotTo(BeNil(), c.input)
-				Expect(result.args).To(ConsistOf(c.args))
+				Expect(ok).To(BeTrue(), c.input)
+				Expect(result).To(ConsistOf(c.args), c.input)
 			} else {
-				Expect(result).To(BeNil(), c.input)
+				Expect(ok).To(BeFalse())
 			}
 		}
 	})

@@ -61,9 +61,9 @@ func testRunner(t *testing.T, when spec.G, it spec.S) {
 			i, err := command.Detect(filepath.Join(".", "..", "fixtures"), []string{"counterfeiter", ".", "AliasedInterface"}, true)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(i).NotTo(BeNil())
-			Expect(len(i)).To(Equal(18))
+			Expect(len(i)).To(Equal(19))
 			Expect(i[0].File).To(Equal("aliased_interfaces.go"))
-			Expect(i[0].Line).To(Equal(7))
+			Expect(i[0].Line).To(Equal(6))
 			Expect(i[0].Args).To(HaveLen(3))
 			Expect(i[0].Args[0]).To(Equal("counterfeiter"))
 			Expect(i[0].Args[1]).To(Equal("."))
@@ -90,30 +90,6 @@ func testRunner(t *testing.T, when spec.G, it spec.S) {
 			Expect(i[0].Args[0]).To(Equal("counterfeiter"))
 			Expect(i[0].Args[1]).To(Equal("."))
 			Expect(i[0].Args[2]).To(Equal("AliasedInterface"))
-		})
-
-		when("there is a mismatch in the file name", func() {
-			it.Before(func() {
-				os.Setenv("GOFILE", "some_other_file.go")
-			})
-
-			it("has no invocations", func() {
-				i, err := command.Detect(filepath.Join(".", "..", "fixtures"), []string{"counterfeiter", ".", "AliasedInterface"}, false)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(i).To(HaveLen(0))
-			})
-		})
-
-		when("there is a mismatch in the line number", func() {
-			it.Before(func() {
-				os.Setenv("GOLINE", "100")
-			})
-
-			it("has no invocations", func() {
-				i, err := command.Detect(filepath.Join(".", "..", "fixtures"), []string{"counterfeiter", ".", "AliasedInterface"}, false)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(i).To(HaveLen(0))
-			})
 		})
 	})
 }

@@ -95,7 +95,7 @@ func New(args []string, workingDir string, evaler Evaler, stater Stater) (*Parse
 }
 
 func (a *ParsedArguments) PrettyPrint() {
-	b, _ := json.Marshal(a)
+	b, _ := json.MarshalIndent(a, "", " ")
 	fmt.Println(string(b))
 }
 
@@ -141,26 +141,29 @@ func (a *ParsedArguments) parseFakeName(packageMode bool, fakeName string, args 
 }
 
 func (a *ParsedArguments) parseOutputPath(packageMode bool, workingDir string, outputPath string, args []string) {
-	if outputPath != "" && packageMode {
-		a.OutputPath = outputPath
-		return
+	outputPathIsFilename := false
+	if strings.HasSuffix(outputPath, ".go") {
+		outputPathIsFilename = true
 	}
+	snakeCaseName := strings.ToLower(camelRegexp.ReplaceAllString(a.FakeImplName, "${1}_${2}"))
 
 	if outputPath != "" {
 		if !filepath.IsAbs(outputPath) {
 			outputPath = filepath.Join(workingDir, outputPath)
 		}
 		a.OutputPath = outputPath
+		if !outputPathIsFilename {
+			a.OutputPath = filepath.Join(a.OutputPath, snakeCaseName+".go")
+		}
 		return
 	}
 
 	if packageMode {
 		a.parseDestinationPackageName(packageMode, args)
-		a.OutputPath = path.Join(workingDir, a.DestinationPackageName)
+		a.OutputPath = path.Join(workingDir, a.DestinationPackageName, snakeCaseName+".go")
 		return
 	}
 
-	snakeCaseName := strings.ToLower(camelRegexp.ReplaceAllString(a.FakeImplName, "${1}_${2}"))
 	d := workingDir
 	if len(args) > 1 {
 		d = a.SourcePackageDir

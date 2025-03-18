@@ -24,19 +24,22 @@ const (
 
 // Fake is used to generate a Fake implementation of an interface.
 type Fake struct {
-	Packages           []*types.Package
-	Package            *types.Package
-	Target             *types.TypeName
-	Mode               FakeMode
-	DestinationPackage string
-	Name               string
-	TargetAlias        string
-	TargetName         string
-	TargetPackage      string
-	Imports            Imports
-	Methods            []Method
-	Function           Method
-	Header             string
+	Packages                            []*types.Package
+	Package                             *types.Package
+	Target                              *types.TypeName
+	Mode                                FakeMode
+	DestinationPackage                  string
+	Name                                string
+	GenericTypeParametersAndConstraints string
+	GenericTypeParameters               string
+	GenericTypeConstraints              string
+	TargetAlias                         string
+	TargetName                          string
+	TargetPackage                       string
+	Imports                             Imports
+	Methods                             []Method
+	Function                            Method
+	Header                              string
 }
 
 // Method is a method of the interface.
@@ -135,7 +138,10 @@ func (f *Fake) Generate(runImports bool) ([]byte, error) {
 	}
 
 	b := &bytes.Buffer{}
-	tmpl.Execute(b, f)
+	err := tmpl.Execute(b, f)
+	if err != nil {
+		return nil, err
+	}
 	if runImports {
 		return imports.Process("counterfeiter_temp_process_file", b.Bytes(), nil)
 	}
