@@ -1,3 +1,8 @@
+# od-fork instructions
+
+As needed, fast-forward merge the latest version from maxbrunsfeld/counterfeiter into master.
+Then rebase this branch on top of master and push the changes.
+
 # `counterfeiter` [![GitHub Actions](https://github.com/maxbrunsfeld/counterfeiter/actions/workflows/go.yml/badge.svg)](https://github.com/maxbrunsfeld/counterfeiter/actions/workflows/go.yml) [![Go Report Card](https://goreportcard.com/badge/github.com/maxbrunsfeld/counterfeiter/v6)](https://goreportcard.com/report/github.com/maxbrunsfeld/counterfeiter/v6) [![GoDoc](https://godoc.org/github.com/maxbrunsfeld/counterfeiter/v6?status.svg)](https://godoc.org/github.com/maxbrunsfeld/counterfeiter/v6)
 
 When writing unit-tests for an object, it is often useful to have fake implementations
